@@ -267,22 +267,23 @@
       color: #3c0f3d;
     }
 
-        .calendar {
-      width: min(420px, 100%);
-      margin: 0 auto !important;
-      max-width: 500px;
-      display: block;
+    .calendar {
+      width: min(520px, 100%);
+      margin: 24px auto 0;
+      max-width: 520px;
       text-align: center;
-      padding: 16px;
+      padding: 18px;
       border-radius: 18px;
       background: rgba(255, 255, 255, 0.98);
       color: #333;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
     }
 
-    .calendar h3 {
-      margin-bottom: 12px;
+    .calendar h3,
+    .calendar-month-year {
       color: #641085;
+      margin-bottom: 12px;
+      font-weight: 700;
     }
 
     .calendar-meta {
@@ -290,24 +291,13 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       align-items: center;
-    }
-
-    .calendar-month-year {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #641085;
-    }
-
-    .calendar-legend {
-      font-size: 0.95rem;
-      color: #555;
     }
 
     .calendar-grid {
       display: grid;
-      grid-template-columns: repeat(7, minmax(60px, 1fr));
+      grid-template-columns: repeat(7, minmax(48px, 1fr));
       gap: 8px;
     }
 
@@ -318,45 +308,42 @@
       background: #fff;
       border: 1px solid rgba(100, 16, 133, 0.14);
       display: flex;
-      align-items: flex-start;
-      justify-content: flex-start;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       color: #333;
-      font-weight: 600;
-      position: relative;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .calendar-day:hover {
+      transform: translateY(-1px);
     }
 
     .calendar-day.empty {
       background: transparent;
       border: none;
       box-shadow: none;
+      cursor: default;
     }
 
     .calendar-day.header {
       background: #641085;
       color: white;
-      text-align: center;
       font-weight: 700;
       justify-content: center;
       min-height: auto;
       padding: 10px 8px;
+      cursor: default;
     }
 
     .calendar-day.today {
-      background: rgba(245, 171, 23, 0.15);
-      border-color: #f5ab17;
-    }
-
-    .calendar-day.weekend {
-      background: rgba(100, 16, 133, 0.06);
-    }
-
-    .calendar-day.selected {
-      outline: 2px solid #641085;
-      box-shadow: inset 0 0 0 2px rgba(100, 16, 133, 0.35);
+      box-shadow: inset 0 0 0 2px rgba(245, 171, 23, 0.4);
     }
 
     .calendar-day.booked {
-      background: rgba(245, 171, 23, 0.12);
+      background: rgba(245, 171, 23, 0.15);
       border-color: #f5ab17;
     }
 
@@ -366,13 +353,9 @@
       color: #a10000;
     }
 
-    .calendar-day.past {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    .calendar-day {
-      cursor: pointer;
+    .calendar-day.selected {
+      outline: 2px solid #641085;
+      box-shadow: inset 0 0 0 2px rgba(100, 16, 133, 0.35);
     }
 
     .calendar-note {
@@ -557,8 +540,7 @@
               <div class="calendar-legend">Seg-Sex 8:00 às 17:00 • Sáb-Dom 8:00 às 12:00</div>
             </div>
             <div class="calendar-grid" id="calendarGrid"></div>
-            <p class="calendar-note">Os dias são exibidos automaticamente para o mês atual. Toque no dia desejado ao fazer o agendamento.</p>
-            <div id="calendarMessage" class="calendar-note"></div>
+            <p class="calendar-note">Clique em uma data para ver os horários disponíveis.</p>
           </div>
         </div>
       </div>
@@ -589,6 +571,7 @@
         <select id="hora" name="hora" required>
           <option value="">Selecione uma hora</option>
         </select>
+        <div id="calendarMessage" class="calendar-note">Escolha uma data para ver horários disponíveis.</div>
 
         <label for="info">Informações adicionais</label>
         <textarea id="info" name="info" placeholder="Informações adicionais"></textarea>
@@ -708,9 +691,88 @@
     }
 
     function clearSelectedCalendarDay() {
-      document.querySelectorAll('.calendar-day.selected').forEach(el => {
-        el.classList.remove('selected');
+      document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
+    }
+
+    function selectCalendarDate(dateStr, dayCell) {
+      const dateInput = document.getElementById('data');
+      if (!dateInput) return;
+      dateInput.value = dateStr;
+      clearSelectedCalendarDay();
+      if (dayCell) {
+        dayCell.classList.add('selected');
+      }
+      updateTimeOptions(dateStr);
+    }
+
+    function buildCalendar() {
+      const calendarGrid = document.getElementById('calendarGrid');
+      const headerLabel = document.getElementById('calendarMonthYear');
+      const calendarMessage = document.getElementById('calendarMessage');
+      if (!calendarGrid || !headerLabel || !calendarMessage) return;
+
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+      headerLabel.textContent = `${monthNames[month]} ${year}`;
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const weekdayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+      calendarGrid.innerHTML = '';
+      weekdayNames.forEach(day => {
+        const dayCell = document.createElement('div');
+        dayCell.className = 'calendar-day header';
+        dayCell.textContent = day;
+        calendarGrid.appendChild(dayCell);
       });
+
+      for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'calendar-day empty';
+        calendarGrid.appendChild(emptyCell);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const dateStr = formatDateValue(year, month, day);
+        const dayCell = document.createElement('div');
+        dayCell.className = 'calendar-day';
+        dayCell.textContent = day;
+
+        if (date.toDateString() === today.toDateString()) {
+          dayCell.classList.add('today');
+        }
+
+        const reserved = getReservedSlots(dateStr);
+        const timeOptions = getTimeOptions(dateStr);
+        if (date < today) {
+          dayCell.classList.add('empty');
+        } else {
+          if (reserved.length && timeOptions.length && reserved.length >= timeOptions.length) {
+            dayCell.classList.add('unavailable');
+          } else if (reserved.length) {
+            dayCell.classList.add('booked');
+          }
+          dayCell.addEventListener('click', () => selectCalendarDate(dateStr, dayCell));
+        }
+
+        const note = document.createElement('span');
+        note.style.fontSize = '0.7rem';
+        note.style.opacity = '0.8';
+        note.style.marginTop = '4px';
+        note.textContent = date.getDay() === 0 || date.getDay() === 6 ? 'Sáb/Dom' : 'Seg-Sex';
+        dayCell.appendChild(note);
+
+        calendarGrid.appendChild(dayCell);
+      }
+
+      if (!document.getElementById('data').value) {
+        calendarMessage.textContent = 'Clique em uma data no calendário ou escolha uma data acima para ver horários disponíveis.';
+      }
     }
 
     function updateTimeOptions(dateStr) {
@@ -745,17 +807,6 @@
           : 'Horários disponíveis. Escolha um horário e envie o agendamento.';
         horaSelect.value = available[0];
       }
-    }
-
-    function selectCalendarDate(dateStr, dayCell) {
-      const dateInput = document.getElementById('data');
-      if (!dateInput) return;
-      dateInput.value = dateStr;
-      clearSelectedCalendarDay();
-      if (dayCell) {
-        dayCell.classList.add('selected');
-      }
-      updateTimeOptions(dateStr);
     }
 
     function enviarWhatsApp(event) {
@@ -873,89 +924,12 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function buildCalendar() {
-      const calendarGrid = document.getElementById('calendarGrid');
-      const headerLabel = document.getElementById('calendarMonthYear');
-      const calendarMessage = document.getElementById('calendarMessage');
-      if (!calendarGrid || !headerLabel) return;
-
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const year = now.getFullYear();
-      const month = now.getMonth();
-      const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-      headerLabel.textContent = `${monthNames[month]} ${year}`;
-
-      const firstDay = new Date(year, month, 1).getDay();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const weekdayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-
-      calendarGrid.innerHTML = '';
-      weekdayNames.forEach(day => {
-        const dayCell = document.createElement('div');
-        dayCell.className = 'calendar-day header';
-        dayCell.textContent = day;
-        calendarGrid.appendChild(dayCell);
-      });
-
-      for (let i = 0; i < firstDay; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.className = 'calendar-day empty';
-        calendarGrid.appendChild(emptyCell);
-      }
-
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month, day);
-        const dateStr = formatDateValue(year, month, day);
-        const dayCell = document.createElement('div');
-        dayCell.className = 'calendar-day';
-        dayCell.textContent = day;
-
-        if (date.toDateString() === now.toDateString()) {
-          dayCell.classList.add('today');
-        }
-
-        if (date.getDay() === 0 || date.getDay() === 6) {
-          dayCell.classList.add('weekend');
-        }
-
-        const reserved = getReservedSlots(dateStr);
-        const timeOptions = getTimeOptions(dateStr);
-        const fullyBooked = timeOptions.length && reserved.length >= timeOptions.length;
-        if (fullyBooked) {
-          dayCell.classList.add('unavailable');
-        } else if (reserved.length) {
-          dayCell.classList.add('booked');
-        }
-
-        if (date < today) {
-          dayCell.classList.add('past');
-        } else {
-          dayCell.addEventListener('click', () => selectCalendarDate(dateStr, dayCell));
-        }
-
-        const availabilityNote = document.createElement('span');
-        availabilityNote.style.fontSize = '0.75rem';
-        availabilityNote.style.opacity = '0.8';
-        availabilityNote.style.marginTop = '6px';
-        availabilityNote.textContent = date.getDay() === 0 || date.getDay() === 6 ? 'Sáb/Dom 8h-12h' : 'Seg-sex 8h-17h';
-        dayCell.appendChild(availabilityNote);
-
-        calendarGrid.appendChild(dayCell);
-      }
-
-      if (calendarMessage) {
-        calendarMessage.textContent = 'Selecione um dia para ver os horários disponíveis e o status do agendamento.';
-      }
-    }
-
     function setupFormListeners() {
       const dateField = document.getElementById('data');
       if (dateField) {
         dateField.addEventListener('change', () => {
           const selectedDate = dateField.value;
           if (selectedDate) {
-            clearSelectedCalendarDay();
             updateTimeOptions(selectedDate);
           }
         });
