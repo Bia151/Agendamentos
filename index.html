@@ -26,6 +26,12 @@
       text-align: center;
     }
 
+    .logo-container img {
+  width: 120px;
+  height: auto;
+  margin-bottom: 15px;
+}
+    
     nav {
       display: flex;
       flex-wrap: wrap;
@@ -146,6 +152,34 @@
       transform: scale(1.05);
     }
 
+.equipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  max-width: 900px;
+  margin: 30px auto;
+}
+
+.equipe-item {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+}
+
+.equipe-item img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.equipe-item h3 {
+  color: #641085;
+  margin-bottom: 10px;
+}
+    
     .funcionamento-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -493,8 +527,12 @@
 </head>
 <body>
 
-  <header>
-    <h1>Cãominhada da Alegria 🐾</h1>
+ <header>
+  <div class="logo-container">
+    <img src="imagens/logo.png" alt="Logo Cãominhada da Alegria">
+  </div>
+
+  <h1>Cãominhada da Alegria 🐾</h1>
     <nav>
       <a href="#quem-somos">Quem Somos</a>
       <a href="#contato">Contato</a>
@@ -515,8 +553,24 @@
       <h2>Quem Somos</h2>
       <p>Somos especialistas apaixonados por animais e prezamos pelo bem-estar deles. Unimos adestramento ético e passeios estruturados para garantir que cada pet receba o cuidado que merece.</p>
       <p>Nossa missão é proporcionar equilíbrio e confiança para a rotina do seu cão, transformando energia em comportamento positivo com uma equipe experiente e dedicada</p>
-      <div class="section-links">
-        <a href="#contato">Contato</a>
+      <section class="section" id="equipe">
+  <h2>Nossa Equipe</h2>
+  <p>Conheça quem cuida do seu pet com carinho, responsabilidade e dedicação.</p>
+
+  <div class="equipe-grid">
+
+    <div class="equipe-item">
+      <img src="imagens/equipe1.jpg" alt="Membro da equipe 1">
+      <h3>Gabriel Augusto</h3>
+      <p>Fundador da Cãominhada da Alegria, Gabriel é o responsável técnico por todos os nossos adestramentos. Especialista em comportamento canino com foco em métodos positivos, ele possui expertise em condicionamento físico para cães de guarda e caça. Com 4 anos de atuação direta em campo e atualmente graduando em Medicina Veterinária, ele atua como analista comportamental, unindo ciência e prática para educar cada pet. Ele acredita que a comunicação clara, aplicada pessoalmente em seus treinamentos, é a chave para um cão equilibrado e uma família em harmonia.</p>
+    </div>
+
+    <div class="equipe-item">
+      <img src="imagens/equipe2.jpg" alt="Membro da equipe 2">
+      <h3>Kamily Dalla Lana</h3>
+      <p>Especialista em comunicação e apaixonada por animais, Kamily é quem dá voz à nossa empresa através do atendimento ao cliente e da criação de conteúdos exclusivos. Além disso, ela também atua em campo realizando passeios seguros e cheios de amor, garantindo que cada cão tenha uma rotina ativa e feliz. Sua conexão com o mundo pet é traduzida no cuidado e carinho que dedica diariamente ao seu gato, o Nox.</p>
+    </div>
+
       </div>
     </section>
 
