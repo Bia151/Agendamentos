@@ -370,6 +370,23 @@
       }
     }
 
+    @media (max-width: 600px) {
+  .calendar {
+    max-width: 320px;
+    padding: 10px;
+  }
+
+  .calendar-grid {
+    grid-template-columns: repeat(7, minmax(30px, 1fr));
+    gap: 4px;
+  }
+
+  .calendar-day {
+    min-height: 35px;
+    padding: 4px;
+    font-size: 12px;
+  }
+}
     form {
       display: flex;
       flex-direction: column;
